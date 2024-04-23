@@ -1,5 +1,3 @@
-.RECIPEPREFIX := $(.RECIPEPREFIX) #
-
 LIBPD = ../libpd/libpd_wrapper
 PD = ../libpd/pure-data/src
 INC = -I$(LIBPD) -I$(PD)
