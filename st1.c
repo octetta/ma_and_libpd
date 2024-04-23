@@ -1,6 +1,8 @@
 /*
   run libpd with audio input/output using miniaudio for a while
+  mutated from
   Dan Wilcox <danomatika.com> 2023
+  sample in the libpd samples/c
 */
 #include <ctype.h>
 #include <pthread.h>
@@ -33,14 +35,10 @@ void sleep_ms(int ms) {
   #endif
 }
 
-// MAIN
-
 uint64_t printtid = 0;
 
 void pdprint(const char *s) {
   if (printtid == 0) pthread_threadid_np(NULL, &printtid);
-  
-  //return;
   
   int n = strlen(s);
   char hex = 0;
@@ -71,8 +69,6 @@ uint64_t noteontid = 0;
 void pdnoteon(int ch, int pitch, int vel) {
   if (noteontid == 0) pthread_threadid_np(NULL, &noteontid);
   
-  //return;
-  
   printf("<~ noteon %d %d %d\n", ch, pitch, vel);
 }
 
@@ -81,8 +77,6 @@ uint64_t floattid = 0;
 void pdfloat(const char *s, float x) {
   if (floattid == 0) pthread_threadid_np(NULL, &floattid);
 
-  //return;
-  
   printf("<~ float %s %f\n", s, x);
 }
 
@@ -153,7 +147,10 @@ void list_devices(void) {
 
 uint64_t maintid = 0;
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
+  
+  printf("miniaudio version %s\n", ma_version_string());
+  
   if (maintid == 0) pthread_threadid_np(NULL, &maintid);
 
   puts("=> ma_context_init");
@@ -280,7 +277,7 @@ int main(int argc, char **argv) {
 
   // open patch       [; pd open file folder(
   if (!libpd_openfile(argv[1], argv[2]))
-    return -1;
+    return 1;
 
   puts("=> ma_device_start");
   sleep_ms(STEP_MS);
