@@ -5,7 +5,7 @@ LIB = ../libpd/libs/libpd.a
 
 all: test1
 
-st1: test1.c
+test1: test1.c
 	cc -g $(INC) test1.c -o test1 $(LIB) -lm \
 	-framework AudioUnit \
 	-framework CoreAudio \
