@@ -26,4 +26,7 @@ usage:
 # note the test.pd file doesn't have a [adc~] object, so this doesn't really
 # do anything obvious.
 
-![test.pd](test_pd.png)
+
+Here's a screen shot of the patch being used in this sample.
+
+![test.pd](https://github.com/octetta/ma_and_libpd/blob/main/test_pd.png)
