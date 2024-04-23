@@ -3,10 +3,10 @@ PD = ../libpd/pure-data/src
 INC = -I$(LIBPD) -I$(PD)
 LIB = ../libpd/libs/libpd.a
 
-all: st1
+all: test1
 
-st1: st1.c
-	cc -g $(INC) st1.c -o st1 $(LIB) -lm \
+st1: test1.c
+	cc -g $(INC) test1.c -o test1 $(LIB) -lm \
 	-framework AudioUnit \
 	-framework CoreAudio \
 	-framework CoreFoundation \
@@ -15,6 +15,6 @@ st1: st1.c
 	#
 
 clean:
-	rm -f st1
-	rm -f st1.o
+	rm -f test1
+	rm -f test1.o
 
