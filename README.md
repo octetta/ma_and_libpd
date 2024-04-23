@@ -25,3 +25,5 @@ usage:
 ./st0 test.pd . 0 0 # select playback device 0 and enables capture device 1
 # note the test.pd file doesn't have a [adc~] object, so this doesn't really
 # do anything obvious.
+
+![test.pd](test_pd.png)
