@@ -17,4 +17,5 @@ test1: test1.c
 clean:
 	rm -f test1
 	rm -f test1.o
+	rm -rf *.dSYM
 
