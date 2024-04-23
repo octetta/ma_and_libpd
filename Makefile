@@ -6,7 +6,11 @@ LIB = ../libpd/libs/libpd.a
 all: test1
 
 test1: test1.c
-	cc -g $(INC) test1.c -o test1 $(LIB) -lm \
+	cc -g $(INC) test1.c -o test1 $(LIB) \
+  -lm \
+  -lpthread \
+  #
+xyzzy:
 	-framework AudioUnit \
 	-framework CoreAudio \
 	-framework CoreFoundation \
