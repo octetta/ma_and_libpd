@@ -364,11 +364,11 @@ int main(int argc, char *argv[]) {
   sleep_ms(STEP_MS);
 
   puts("thread info");
-  printf("     main = %llu\n", maintid);
-  printf("    cbtid = %lld\n", cbtid);
-  printf(" printtid = %lld\n", printtid);
-  printf(" floattid = %lld\n", floattid);
-  printf("noteontid = %lld\n", noteontid);
+  printf("     main = %p\n", maintid);
+  printf("    cbtid = %p\n", cbtid);
+  printf(" printtid = %p\n", printtid);
+  printf(" floattid = %p\n", floattid);
+  printf("noteontid = %p\n", noteontid);
 
   return 0;
 }

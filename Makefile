@@ -3,20 +3,16 @@ PD = ../libpd/pure-data/src
 INC = -I$(LIBPD) -I$(PD)
 LIB = ../libpd/libs/libpd.a
 
+LIB += -lpthread  -lm 
+
+ifeq ($(shell uname -s), Darwin)
+LIB += -framework AudioUnit -framework CoreAudio -framework CoreFoundation
+endif
+
 all: test1
 
 test1: test1.c
-	cc -g $(INC) test1.c -o test1 $(LIB) \
-  -lm \
-  -lpthread \
-  #
-xyzzy:
-	-framework AudioUnit \
-	-framework CoreAudio \
-	-framework CoreFoundation \
-	-framework AudioToolbox \
-	-framework CoreServices \
-	#
+	cc -g $(INC) test1.c -o test1 $(LIB)
 
 clean:
 	rm -f test1
