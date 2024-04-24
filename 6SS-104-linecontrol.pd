@@ -1,0 +1,43 @@
+#N canvas 84 109 639 379 10;
+#X obj 73 215 +~;
+#X obj 73 346 dac~;
+#X obj 21 174 -~ 0.5;
+#X obj 107 174 -~ 0.5;
+#X obj 20 146 phasor~ 220;
+#X obj 106 146 phasor~ 221;
+#X obj 74 314 *~ 0.2;
+#X obj 154 237 vsl 15 64 0 0.3 0 0 empty empty amp 0 -8 1 8 -262144
+-258699 -1 4900 1;
+#X obj 201 237 vsl 15 64 0 2000 0 0 empty empty filter_freq 0 -8 1
+8 -262144 -258699 -1 0 1;
+#X obj 210 144 line;
+#X obj 210 188 + 100;
+#X obj 210 167 * 2000;
+#X text 121 96 rise -->;
+#X text 121 118 fall -->;
+#X text 177 22 Controlling filter frequency with a line;
+#X text 206 1 Six simple synthesisers 104;
+#X obj 73 242 bp~ 100 3;
+#X text 268 166 <-- range of sweep;
+#X text 224 269 <-- fader temporarily disconnected;
+#X text 269 189 <-- minimum \, bottom of sweep range;
+#X msg 210 94 1 1892;
+#X text 278 93 <--- message to go to one in 1892 milliseconds;
+#X msg 220 114 0 7000;
+#X text 276 116 <--- message to go to zero in 7 seconds;
+#X text 208 66 Click these messages to send them to line generator
+;
+#X connect 0 0 16 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 1;
+#X connect 4 0 2 0;
+#X connect 5 0 3 0;
+#X connect 6 0 1 0;
+#X connect 6 0 1 1;
+#X connect 7 0 6 1;
+#X connect 9 0 11 0;
+#X connect 10 0 16 1;
+#X connect 11 0 10 0;
+#X connect 16 0 6 0;
+#X connect 20 0 9 0;
+#X connect 22 0 9 0;

@@ -95,6 +95,8 @@ int buffersize = 512;
 
 pthread_t cbtid = 0;
 
+uint64_t callback_count = 0;
+
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frame_count) {
   int ticks = buffersize / libpd_blocksize();
   if (cbtid == 0) cbtid = pthread_self();
@@ -103,7 +105,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     exit(1);
   }
   libpd_process_short(ticks, pInput, pOutput);
-  //libpd_process_short(ticks, NULL, pOutput);
+  callback_count++;
 }
 
 ma_device_config config;
@@ -293,6 +295,9 @@ int main(int argc, char *argv[]) {
   sleep_ms(STEP_MS);
 
   libpd_bang("start");
+  sleep_ms(STEP_MS);
+
+  libpd_float("rate", 750);
 
   // samples are processed by pd in audio thread (data_callback)
   //

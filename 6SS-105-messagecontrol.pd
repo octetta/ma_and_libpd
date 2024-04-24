@@ -1,0 +1,74 @@
+#N canvas 84 109 671 552 10;
+#X obj 54 351 +~;
+#X obj 53 507 dac~;
+#X obj 2 310 -~ 0.5;
+#X obj 88 310 -~ 0.5;
+#X obj 1 282 phasor~ 220;
+#X obj 87 282 phasor~ 221;
+#X obj 54 475 *~ 0.2;
+#X obj 216 357 vsl 15 64 0 0.3 0 0 empty empty amp 0 -8 1 8 -262144
+-258699 -1 0 1;
+#X obj 398 372 vsl 15 64 0 2000 0 0 empty empty filter_freq 0 -8 1
+8 -262144 -258699 -1 0 1;
+#X obj 213 281 line;
+#X obj 54 378 bp~ 100 3;
+#X msg 223 256 1 \$1;
+#X msg 184 255 0 \$1;
+#X text 269 259 <-- message substitution;
+#X obj 240 130 vsl 15 64 0 2000 0 1 empty empty attack 0 -8 1 8 -262144
+-258699 -1 100 1;
+#X obj 284 131 vsl 15 64 0 2000 0 1 empty empty decay 0 -8 1 8 -262144
+-258699 -1 800 1;
+#X floatatom 240 204 5 0 0 0 - - -;
+#X floatatom 284 204 5 0 0 0 - - -;
+#X obj 223 234 f;
+#X obj 184 233 f;
+#X text 137 24 Controlling filter frequency with an envelope generator
+;
+#X obj 184 210 del;
+#X obj 184 183 t b b;
+#X text 145 56 Move the attack and decay faders to change envelope
+settings and click the bang button to fire the envelope generator.
+;
+#X text 244 2 Six simple synthesisers 105;
+#X obj 184 159 bng 15 130 50 0 empty empty empty 0 -6 0 8 -262144 -258699
+-1;
+#X obj 213 325 + 20;
+#X text 271 326 <-- we moved the bottom down a bit to make the filter
+completely shut off any sound when the envelope is not running.;
+#X obj 213 304 * 3000;
+#X text 271 303 <-- we increased the range a little bit;
+#X text 284 234 <-- float boxes store values until triggered;
+#X text 2 210 delay by attack time -->;
+#X text 323 154 <-- attack fader also sets delay time;
+#X obj 54 452 hip~ 60;
+#X text 114 453 <------ extra high pass to remove very low frequencies
+;
+#X text -5 183 evaluate right to left ->;
+#X text 2 234 then fire decay ------->;
+#X connect 0 0 10 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 1;
+#X connect 4 0 2 0;
+#X connect 5 0 3 0;
+#X connect 6 0 1 0;
+#X connect 6 0 1 1;
+#X connect 7 0 6 1;
+#X connect 9 0 28 0;
+#X connect 10 0 33 0;
+#X connect 11 0 9 0;
+#X connect 12 0 9 0;
+#X connect 14 0 16 0;
+#X connect 14 0 18 1;
+#X connect 14 0 21 1;
+#X connect 15 0 17 0;
+#X connect 15 0 19 1;
+#X connect 18 0 11 0;
+#X connect 19 0 12 0;
+#X connect 21 0 19 0;
+#X connect 22 0 21 0;
+#X connect 22 1 18 0;
+#X connect 25 0 22 0;
+#X connect 26 0 10 1;
+#X connect 28 0 26 0;
+#X connect 33 0 6 0;

@@ -30,3 +30,11 @@ usage:
 Here's a screen shot of the patch being used in this sample.
 
 ![test.pd](https://github.com/octetta/ma_and_libpd/blob/main/test_pd.png)
+
+----
+
+I've crammed a bunch of PD files from obiwannabe.co.uk here to test with.
+
+I can't find a live version of this site, so it's scraped from
+
+https://web.archive.org/web/20070513224738/http://www.obiwannabe.co.uk/html/music/6SS/six-simple-synthesisers.html

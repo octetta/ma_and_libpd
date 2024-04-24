@@ -1,0 +1,87 @@
+#N canvas 0 0 713 417 10;
+#X obj 55 283 +~;
+#X obj 54 391 dac~;
+#X obj 3 242 -~ 0.5;
+#X obj 89 242 -~ 0.5;
+#X obj 2 214 phasor~ 220;
+#X obj 88 214 phasor~ 221;
+#X obj 55 359 *~ 0.2;
+#X obj 494 111 vsl 15 64 0 0.3 0 0 empty empty amp 0 -8 1 8 -262144
+-258699 -1 3800 1;
+#X obj 362 111 vsl 15 64 0 2000 0 0 empty empty filter_freq 0 -8 1
+8 -262144 -258699 -1 1400 1;
+#X obj 55 310 bp~ 100 3;
+#X obj 214 257 + 20;
+#X obj 55 336 hip~ 60;
+#N canvas 0 0 450 300 envelope 0;
+#X obj 175 243 line;
+#X msg 194 219 1 \$1;
+#X msg 150 218 0 \$1;
+#X obj 150 146 t b b;
+#X obj 175 267 outlet;
+#X obj 187 46 inlet attack;
+#X obj 289 45 inlet decay;
+#X obj 77 46 inlet trigger;
+#X obj 187 87 t f f;
+#X obj 150 196 f 50;
+#X obj 194 197 f 50;
+#X text 235 199 <-- default values 50 ms;
+#X text 236 88 <-- set floats nicely;
+#X obj 150 173 del 50;
+#X text 151 9 envelope subpatch;
+#X connect 0 0 4 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 13 0;
+#X connect 3 1 10 0;
+#X connect 5 0 8 0;
+#X connect 6 0 9 1;
+#X connect 7 0 3 0;
+#X connect 8 0 13 1;
+#X connect 8 1 10 1;
+#X connect 9 0 2 0;
+#X connect 10 0 1 0;
+#X connect 13 0 9 0;
+#X restore 214 207 pd envelope;
+#X obj 214 180 bng 15 130 50 0 empty empty fire 0 -6 0 8 -262144 -258699
+-1;
+#X obj 251 111 vsl 15 64 0 2000 0 1 empty empty attack 0 -8 1 8 -262144
+-258699 -1 1700 1;
+#X obj 306 111 vsl 15 64 0 2000 0 1 empty empty decay 0 -8 1 8 -262144
+-258699 -1 2900 1;
+#X floatatom 251 184 5 0 0 0 - - -;
+#X floatatom 306 184 5 0 0 0 - - -;
+#X floatatom 362 184 5 0 0 0 - - -;
+#X floatatom 494 184 5 0 0 0 - - -;
+#X obj 214 232 * 3000;
+#X text 145 56 Envelope generator subpatched and more controls added
+for the filter range.;
+#X obj 424 111 vsl 15 64 0 3000 0 0 empty empty filter_range 0 -8 1
+8 -262144 -258699 -1 3100 1;
+#X floatatom 424 184 5 0 0 0 - - -;
+#X text 244 2 Six simple synthesisers 106;
+#X text 137 24 Controlling filter frequency with an envelope generator
+II;
+#X connect 0 0 9 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 1;
+#X connect 4 0 2 0;
+#X connect 5 0 3 0;
+#X connect 6 0 1 0;
+#X connect 6 0 1 1;
+#X connect 7 0 6 1;
+#X connect 7 0 19 0;
+#X connect 8 0 18 0;
+#X connect 8 0 10 1;
+#X connect 9 0 11 0;
+#X connect 10 0 9 1;
+#X connect 11 0 6 0;
+#X connect 12 0 20 0;
+#X connect 13 0 12 0;
+#X connect 14 0 16 0;
+#X connect 14 0 12 1;
+#X connect 15 0 17 0;
+#X connect 15 0 12 2;
+#X connect 20 0 10 0;
+#X connect 22 0 23 0;
+#X connect 22 0 20 1;
