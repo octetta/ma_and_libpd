@@ -118,6 +118,7 @@ uint64_t callback_count = 0;
 
 typedef struct {
     char mode;
+    int id;
     struct timespec t0;
     struct timespec t1;
     unsigned int callback_count;
@@ -130,7 +131,10 @@ typedef struct {
 #define TRSTART (1)
 #define TRSTOP  (2)
 
-trigger_t trigger[TRC] = {[0 ... TRM].mode = 0 };
+trigger_t trigger[TRC] = {[0 ... TRM] = {
+  .mode = 0,
+  .id = -1,
+}};
 int trp = 0;
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frame_count) {
@@ -376,7 +380,8 @@ int main(int argc, char *argv[]) {
 #define DUR (10)
   for (int i = 0; i < DUR; i++) {
     if ((i&1) == 0) {
-      puts(">>> TRIGGER");
+      printf(">>> TRIGGER#%d\n", i);
+      trigger[trp%TRM].id = i;
       clock_gettime(CT, &trigger[trp&TRM].t0);
       trigger[trp&TRM].mode = TRSTART;
     }
@@ -454,12 +459,14 @@ int main(int argc, char *argv[]) {
         n = 1000000000 + trigger[trp&TRM].t1.tv_nsec - trigger[trp&TRM].t0.tv_nsec;
       }
       double m = n / 1000000.0;
-      printf(">>> %ld ns / %f ms%c",
+      printf(">>> #%d : %ld ns / %f ms%c",
+        trigger[trp&TRM].id,
         n,
         m,
         '\n');
 #else
-      printf(">>> %d %ld/%ld %ld/%ld%c\n",
+      printf(">>> #%d : %d %ld/%ld %ld/%ld%c\n",
+        trigger[trp&TRM].id,
         trigger[trp&TRM].mode,
         trigger[trp&TRM].t0.tv_sec,
         trigger[trp&TRM].t0.tv_nsec,
