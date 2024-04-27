@@ -35,10 +35,27 @@ void sleep_ms(int ms) {
   #endif
 }
 
+//#define CT CLOCK_PROCESS_CPUTIME_ID
+#define CT CLOCK_REALTIME
+
+typedef struct {
+    char valid;
+    struct timespec t0;
+    unsigned int callback_count;
+    unsigned int zero_run;
+} tracker_t;
+
+#define STC 8
+#define STM (STC-1)
+
+tracker_t st[STC];
+char sp = 0;
+
 pthread_t printtid = 0;
 
 void pdprint(const char *s) {
   if (printtid == 0) printtid = pthread_self();
+  return;
   
   int n = strlen(s);
   char hex = 0;
@@ -77,6 +94,8 @@ pthread_t floattid = 0;
 void pdfloat(const char *s, float x) {
   if (floattid == 0) floattid = pthread_self();
 
+  return;
+
   printf("<~ float %s %f\n", s, x);
 }
 
@@ -97,7 +116,36 @@ pthread_t cbtid = 0;
 
 uint64_t callback_count = 0;
 
+typedef struct {
+    char mode;
+    struct timespec t0;
+    struct timespec t1;
+    unsigned int callback_count;
+    unsigned int zero_run;
+} trigger_t;
+
+#define TRC (4)
+#define TRM (TRC-1)
+#define TROFF   (0)
+#define TRSTART (1)
+#define TRSTOP  (2)
+
+trigger_t trigger[TRC] = {[0 ... TRM].mode = 0 };
+int trp = 0;
+
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frame_count) {
+  if (trigger[trp].mode == TRSTART) {
+    trigger[trp].mode = TRSTOP;
+    clock_gettime(CT, &trigger[trp&TRM].t1);
+  }
+
+  clock_gettime(CT, &st[sp&STM].t0);
+  st[sp&STM].valid = 1;
+  if ((sp&1) == 0) {
+    st[(sp+1)&STM].valid = 0;
+  }
+  sp++;
+
   int ticks = buffersize / libpd_blocksize();
   if (cbtid == 0) cbtid = pthread_self();
   if (frame_count != buffersize) {
@@ -150,7 +198,9 @@ void list_devices(void) {
 pthread_t maintid = 0;
 
 int main(int argc, char *argv[]) {
-  
+  struct timespec bigbang;
+  clock_gettime(CT, &bigbang);
+
   printf("miniaudio version %s\n", ma_version_string());
   
   if (maintid == 0) maintid = pthread_self();
@@ -213,6 +263,12 @@ int main(int argc, char *argv[]) {
   config.sampleRate        = samplerate;
   config.dataCallback      = data_callback;
   config.pUserData         = custom_data;
+
+#if 0
+  for (int i=0; i<STC; i++) {
+    st[i].valid = 0;
+  }
+#endif
 
   if (capture >= 0) {
     config.capture.format = ma_format_s16;
@@ -317,14 +373,101 @@ int main(int argc, char *argv[]) {
   puts("=> note loop start");
   sleep_ms(STEP_MS);
 
-  for (int i = 0; i < 40; i++) {
+#define DUR (10)
+  for (int i = 0; i < DUR; i++) {
+    if ((i&1) == 0) {
+      puts(">>> TRIGGER");
+      clock_gettime(CT, &trigger[trp&TRM].t0);
+      trigger[trp&TRM].mode = TRSTART;
+    }
     libpd_float("freq", (i+70)/2);
-    if (i  == (40/2)) {
+    if (i  == (DUR/2)) {
       puts("extra bang start");
       libpd_bang("start");
     }
-    sleep_ms(250);
     printf("sleep #%d\n", i+1);
+    //
+    for (int j=0; j<STC; j+=2) {
+      long x = st[j].t0.tv_sec - bigbang.tv_sec;
+      x = j; // figure out stuff about showing time
+      if (st[j].valid && st[j+1].valid) {
+        long n;
+        if (st[j].t0.tv_sec == st[j+1].t0.tv_sec) {
+          n = st[j+1].t0.tv_nsec - st[j].t0.tv_nsec;
+        } else {
+          n = 1000000000 + st[j+1].t0.tv_nsec - st[j].t0.tv_nsec;
+        }
+        double m = n / 1000000.0;
+        printf("[%ld] %ld ns / %f ms%c",
+          x,
+          n,
+          m,
+          '\n');
+        } else {
+          printf("[%ld] --incomplete--\n", x);
+        }
+    }
+#if 0
+        for (int j=0; j<STC; j++) {
+            char c = ' ';
+            int now = j;
+            int prev = j-1;
+            if (prev < 0) {
+                prev = STM;
+            }
+            if (st[now].callback_count < st[prev].callback_count) c = '*';
+            unsigned int n = 0;
+            double m = 0;
+            if (c == ' ' && st[now].valid && st[prev].valid) {
+                struct timespec temp;
+                if ((st[now].t0.tv_nsec-st[prev].t0.tv_nsec)<0) {
+                    temp.tv_sec = st[now].t0.tv_sec-st[prev].t0.tv_sec-1;
+                    temp.tv_nsec = 1000000000+st[now].t0.tv_nsec-st[prev].t0.tv_nsec;
+                } else {
+                    temp.tv_sec = st[now].t0.tv_sec-st[prev].t0.tv_sec;
+                    temp.tv_nsec = st[now].t0.tv_nsec-st[prev].t0.tv_nsec;
+                }
+                //n = st[now].t0.tv_nsec - st[prev].t0.tv_nsec;
+                n = temp.tv_nsec;
+                m = n / 1000000.0;
+            }
+            printf("%c [%d] %ld sec, %ld nsec, %d cbc, #0=%d (%d nsec / %f msec)\n",
+                c,
+                j,
+                st[j].t0.tv_sec,
+                st[j].t0.tv_nsec,
+                st[j].callback_count,
+                st[j].zero_run,
+                n,
+                m);
+        }
+#endif
+    //
+    sleep_ms(250);
+    if ((i&1) == 0) {
+#if 1
+      // >>> 2 1714157541/65555000 1714157541/67869000
+      long n;
+      if (trigger[trp&TRM].t0.tv_sec == trigger[trp&TRM].t1.tv_sec) {
+        n = trigger[trp&TRM].t1.tv_nsec - trigger[trp&TRM].t0.tv_nsec;
+      } else {
+        n = 1000000000 + trigger[trp&TRM].t1.tv_nsec - trigger[trp&TRM].t0.tv_nsec;
+      }
+      double m = n / 1000000.0;
+      printf(">>> %ld ns / %f ms%c",
+        n,
+        m,
+        '\n');
+#else
+      printf(">>> %d %ld/%ld %ld/%ld%c\n",
+        trigger[trp&TRM].mode,
+        trigger[trp&TRM].t0.tv_sec,
+        trigger[trp&TRM].t0.tv_nsec,
+        trigger[trp&TRM].t1.tv_sec,
+        trigger[trp&TRM].t1.tv_nsec,
+        0);
+#endif
+    }
   }
 
   puts("=> several notes to freq/alt");

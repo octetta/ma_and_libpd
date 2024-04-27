@@ -16,20 +16,20 @@ entries from the compile line.
 usage:
 
 ```
-./st0 test.pd . # runs with default playback device
+./st0 sin1.pd . # runs with default playback device
 
 ./st0 # shows playback / capture devices and exits
 
-./st0 test.pd . 0 # selects playback device 0
+./st0 sin1.pd . 0 # selects playback device 0
 
-./st0 test.pd . 0 1 # select playback device 0 and enables capture device 1
-# note the test.pd file doesn't have a [adc~] object, so this doesn't really
+./st0 sin1.pd . 0 1 # select playback device 0 and enables capture device 1
+# note the sin1.pd file doesn't have a [adc~] object, so this doesn't really
 # do anything obvious.
 ```
 
 Here's a screen shot of the patch being used in this sample.
 
-![test.pd](https://github.com/octetta/ma_and_libpd/blob/main/test_pd.png)
+![sin1.pd](https://github.com/octetta/ma_and_libpd/blob/main/test_pd.png)
 
 ----
 
