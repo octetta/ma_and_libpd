@@ -139,8 +139,8 @@ int trp = 0;
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frame_count) {
   if (trigger[trp].mode == TRSTART) {
-    trigger[trp].mode = TRSTOP;
     clock_gettime(CT, &trigger[trp&TRM].t1);
+    trigger[trp].mode = TRSTOP;
   }
 
   clock_gettime(CT, &st[sp&STM].t0);
