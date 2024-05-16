@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+
 #include <time.h>
 #include "z_libpd.h"
 
@@ -35,12 +36,30 @@ void sleep_ms(int ms) {
   #endif
 }
 
+// chatgpt code for timespec_diff
+
+long long timespec_diff(struct timespec *start, struct timespec *end) {
+    long long diff_sec = end->tv_sec - start->tv_sec;
+    long long diff_nsec = end->tv_nsec - start->tv_nsec;
+    
+    // Adjust if the difference in nanoseconds is negative
+    if (diff_nsec < 0) {
+        diff_sec--;
+        diff_nsec += 1000000000; // 1 second in nanoseconds
+    }
+
+    return diff_sec * 1000000000 + diff_nsec; // Convert seconds to nanoseconds
+}
+
 //#define CT CLOCK_PROCESS_CPUTIME_ID
 #define CT CLOCK_REALTIME
 
 typedef struct {
     char valid;
     struct timespec t0;
+    struct timespec t1;
+    struct timespec t2;
+    struct timespec t3;
     unsigned int callback_count;
     unsigned int zero_run;
 } tracker_t;
@@ -121,6 +140,8 @@ typedef struct {
     int id;
     struct timespec t0;
     struct timespec t1;
+    struct timespec t2;
+    struct timespec t3;
     unsigned int callback_count;
     unsigned int zero_run;
 } trigger_t;
@@ -148,7 +169,6 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
   if ((sp&1) == 0) {
     st[(sp+1)&STM].valid = 0;
   }
-  sp++;
 
   int ticks = buffersize / libpd_blocksize();
   if (cbtid == 0) cbtid = pthread_self();
@@ -156,7 +176,12 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     printf("AUGH\n");
     exit(1);
   }
+  clock_gettime(CT, &st[sp&STM].t2);
   libpd_process_short(ticks, pInput, pOutput);
+  clock_gettime(CT, &st[sp&STM].t3);
+  
+  sp++;
+  
   callback_count++;
 }
 
@@ -394,16 +419,13 @@ int main(int argc, char *argv[]) {
     //
     for (int j=0; j<STC; j+=2) {
       long x = st[j].t0.tv_sec - bigbang.tv_sec;
+      long long n;
+      double m;
       x = j; // figure out stuff about showing time
       if (st[j].valid && st[j+1].valid) {
-        long n;
-        if (st[j].t0.tv_sec == st[j+1].t0.tv_sec) {
-          n = st[j+1].t0.tv_nsec - st[j].t0.tv_nsec;
-        } else {
-          n = 1000000000 + st[j+1].t0.tv_nsec - st[j].t0.tv_nsec;
-        }
-        double m = n / 1000000.0;
-        printf("[%ld] %ld ns / %f ms%c",
+        n = timespec_diff(&st[j].t0, &st[j+1].t0);
+        m = n / 1000000.0;
+        printf("[%ld] %lld ns / %f ms%c",
           x,
           n,
           m,
@@ -411,6 +433,12 @@ int main(int argc, char *argv[]) {
         } else {
           printf("[%ld] --incomplete--\n", x);
         }
+        n = timespec_diff(&st[j].t2, &st[j].t3);
+        m = n / 1000000.0;
+        printf("in libpd[0] :: %lld ns / %f ms\n", n, m);
+        n = timespec_diff(&st[j+1].t2, &st[j+1].t3);
+        m = n / 1000000.0;
+        printf("in libpd[1] :: %lld ns / %f ms\n", n, m);
     }
 #if 0
         for (int j=0; j<STC; j++) {
