@@ -165,23 +165,28 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
   }
 
   clock_gettime(CT, &st[sp&STM].t0);
+  
   st[sp&STM].valid = 1;
   if ((sp&1) == 0) {
     st[(sp+1)&STM].valid = 0;
   }
 
+  
   int ticks = buffersize / libpd_blocksize();
+  
   if (cbtid == 0) cbtid = pthread_self();
+  
   if (frame_count != buffersize) {
     printf("AUGH\n");
     exit(1);
   }
+  
   clock_gettime(CT, &st[sp&STM].t2);
   libpd_process_short(ticks, pInput, pOutput);
   clock_gettime(CT, &st[sp&STM].t3);
   
   sp++;
-  
+
   callback_count++;
 }
 
@@ -418,27 +423,26 @@ int main(int argc, char *argv[]) {
     printf("sleep #%d\n", i+1);
     //
     for (int j=0; j<STC; j+=2) {
-      long x = st[j].t0.tv_sec - bigbang.tv_sec;
+      //long x = st[j].t0.tv_sec - bigbang.tv_sec;
       long long n;
       double m;
-      x = j; // figure out stuff about showing time
       if (st[j].valid && st[j+1].valid) {
         n = timespec_diff(&st[j].t0, &st[j+1].t0);
         m = n / 1000000.0;
-        printf("[%ld] %lld ns / %f ms%c",
-          x,
+        printf("[%d] %lld ns / %f ms%c",
+          j,
           n,
           m,
           '\n');
         } else {
-          printf("[%ld] --incomplete--\n", x);
+          printf("[%d] --incomplete--\n", j);
         }
         n = timespec_diff(&st[j].t2, &st[j].t3);
         m = n / 1000000.0;
-        printf("in libpd[0] :: %lld ns / %f ms\n", n, m);
+        printf("in libpd[%d] :: %lld ns / %f ms\n", j, n, m);
         n = timespec_diff(&st[j+1].t2, &st[j+1].t3);
         m = n / 1000000.0;
-        printf("in libpd[1] :: %lld ns / %f ms\n", n, m);
+        printf("in libpd[%d] :: %lld ns / %f ms\n", j+1, n, m);
     }
 #if 0
         for (int j=0; j<STC; j++) {
