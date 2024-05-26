@@ -551,11 +551,11 @@ int main(int argc, char *argv[]) {
   sleep_ms(STEP_MS);
 
   puts("thread info");
-  printf("     main = %p\n", maintid);
-  printf("    cbtid = %p\n", cbtid);
-  printf(" printtid = %p\n", printtid);
-  printf(" floattid = %p\n", floattid);
-  printf("noteontid = %p\n", noteontid);
+  if (maintid)   printf("     main = %p\n", maintid);
+  if (cbtid)     printf("    cbtid = %p\n", cbtid);
+  if (printtid)  printf(" printtid = %p\n", printtid);
+  if (floattid)  printf(" floattid = %p\n", floattid);
+  if (noteontid) printf("noteontid = %p\n", noteontid);
 
   return 0;
 }
